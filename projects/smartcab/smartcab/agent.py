@@ -6,10 +6,10 @@ from simulator import Simulator
 
 class LearningAgent(Agent):
     """ An agent that learns to drive in the Smartcab world.
-        This is the object you will be modifying. """ 
+        This is the object you will be modifying. """
 
-    def __init__(self, env, learning=True, epsilon=0.8, alpha=0.6):
-        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment 
+    def __init__(self, env, learning=True, epsilon=1.0, alpha=0.8):
+        super(LearningAgent, self).__init__(env)     # Set the agent in the evironment
         self.planner = RoutePlanner(self.env, self)  # Create a route planner
         self.valid_actions = self.env.valid_actions  # The set of valid actions
 
@@ -29,11 +29,11 @@ class LearningAgent(Agent):
 
         # Select the destination as the new location to route to
         self.planner.route_to(destination)
-        
+
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-        
+
         if testing == True:
             self.epsilon = 0
             self.epsilon = 0
@@ -44,12 +44,12 @@ class LearningAgent(Agent):
         return None
 
     def build_state(self):
-        """ The build_state function is called when the agent requests data from the 
-            environment. The next waypoint, the intersection inputs, and the deadline 
+        """ The build_state function is called when the agent requests data from the
+            environment. The next waypoint, the intersection inputs, and the deadline
             are all features available to the agent. """
 
         # Collect data about the environment
-        waypoint = self.planner.next_waypoint() # The next waypoint 
+        waypoint = self.planner.next_waypoint() # The next waypoint
         inputs = self.env.sense(self)           # Visual input - intersection light and traffic
         deadline = self.env.get_deadline(self)  # Remaining deadline
 
@@ -73,7 +73,7 @@ class LearningAgent(Agent):
         maxQ = max(q)
 
 
-        return maxQ 
+        return maxQ
 
 
     def createQ(self, state):
@@ -111,16 +111,14 @@ class LearningAgent(Agent):
                 action = random.choice(self.valid_actions)
             else:
                 maxQ = self.get_maxQ(state)
-                for a in self.valid_actions:
-                    if self.Q[state][a] == maxQ:
-                        action = a
+                action = random.choice([a for a in self.valid_actions if self.Q[state][a] == maxQ])
 
         return action
 
 
     def learn(self, state, action, reward):
         """ The learn function is called after the agent completes an action and
-            receives an award. This function does not consider future rewards 
+            receives an award. This function does not consider future rewards
             when conducting learning. """
 
         # When learning, implement the value iteration update rule
@@ -132,7 +130,7 @@ class LearningAgent(Agent):
 
 
     def update(self):
-        """ The update function is called when a time step is completed in the 
+        """ The update function is called when a time step is completed in the
             environment for a given trial. This function will build the agent
             state, choose an action, receive a reward, and learn if enabled. """
 
@@ -143,10 +141,10 @@ class LearningAgent(Agent):
         self.learn(state, action, reward)   # Q-learn
 
         return
-        
+
 
 def run():
-    """ Driving function for running the simulation. 
+    """ Driving function for running the simulation.
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
 
     ##############
@@ -156,7 +154,7 @@ def run():
     #   num_dummies - discrete number of dummy agents in the environment, default is 100
     #   grid_size   - discrete number of intersections (columns, rows), default is (8, 6)
     env = Environment(verbose=False)
-    
+
     ##############
     # Create the driving agent
     # Flags:
@@ -164,7 +162,7 @@ def run():
     #    * epsilon - continuous value for the exploration factor, default is 1
     #    * alpha   - continuous value for the learning rate, default is 0.5
     agent = env.create_agent(LearningAgent)
-    
+
     ##############
     # Follow the driving agent
     # Flags:
@@ -179,11 +177,11 @@ def run():
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
     sim = Simulator(env,update_delay=0.0,display=False,log_metrics=True,optimized=True)
-    
+
     ##############
     # Run the simulator
     # Flags:
-    #   tolerance  - epsilon tolerance before beginning testing, default is 0.05 
+    #   tolerance  - epsilon tolerance before beginning testing, default is 0.05
     #   n_test     - discrete number of testing trials to perform, default is 0
     sim.run(n_test=30, tolerance=0.01)
 
