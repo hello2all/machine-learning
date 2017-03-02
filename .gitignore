@@ -63,3 +63,10 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# extra
+*.zip
+*.pkl
+*.pdf
+projects/capstone/GTSRB/
+projects/capstone/GTSRB_Test/
